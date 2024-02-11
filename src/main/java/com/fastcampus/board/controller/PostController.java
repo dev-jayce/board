@@ -20,7 +20,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<List<Post>> getPosts() {
-        List<Post> posts = postService.getPosts();
+        var posts = postService.getPosts();
         return ResponseEntity.ok(posts);
     }
 
@@ -34,7 +34,7 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody PostPostRequestBody postPostRequestBody) {
-        Post post = postService.createPost(postPostRequestBody);
+        var post = postService.createPost(postPostRequestBody);
         return ResponseEntity.ok(post);
     }
 }
