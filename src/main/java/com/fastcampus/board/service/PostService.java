@@ -1,6 +1,7 @@
 package com.fastcampus.board.service;
 
 import com.fastcampus.board.model.post.Post;
+import com.fastcampus.board.model.post.PostPostRequestBody;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -27,5 +28,16 @@ public class PostService {
         return posts.stream()
                 .filter(post -> postId.equals(post.getPostId()))
                 .findFirst();
+    }
+
+    public Post createPost(PostPostRequestBody postPostRequestBody) {
+        Long newPostId = posts.stream()
+                .mapToLong(Post::getPostId)
+                .max()
+                .orElse(0L) + 1;
+
+        Post newPost = new Post(newPostId, postPostRequestBody.getBody(), ZonedDateTime.now());
+        posts.add(newPost);
+        return newPost;
     }
 }
