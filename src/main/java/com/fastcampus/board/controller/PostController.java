@@ -5,7 +5,7 @@ import com.fastcampus.board.model.post.PostPatchRequestBody;
 import com.fastcampus.board.model.post.PostPostRequestBody;
 import com.fastcampus.board.service.PostService;
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +24,8 @@ public class PostController {
 
   @GetMapping("/{postId}")
   public ResponseEntity<Post> getPostByPostId(@PathVariable Long postId) {
-    Optional<Post> matchingPost = postService.getPostById(postId);
-    return matchingPost.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    var post = postService.getPostByPostId(postId);
+    return ResponseEntity.ok(post);
   }
 
   @PostMapping
