@@ -17,7 +17,8 @@ public class PostEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long postId;
 
-  @Column private String body;
+  @Column(columnDefinition = "TEXT")
+  private String body;
 
   @Column private ZonedDateTime createdDateTime;
 
