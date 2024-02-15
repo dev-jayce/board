@@ -1,5 +1,6 @@
 package com.fastcampus.board.service;
 
+import com.fastcampus.board.exception.post.PostNotFoundException;
 import com.fastcampus.board.model.entity.PostEntity;
 import com.fastcampus.board.model.post.Post;
 import com.fastcampus.board.model.post.PostPatchRequestBody;
@@ -7,9 +8,7 @@ import com.fastcampus.board.model.post.PostPostRequestBody;
 import com.fastcampus.board.repository.PostEntityRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class PostService {
@@ -23,10 +22,7 @@ public class PostService {
 
   public Post getPostByPostId(Long postId) {
     var postEntity =
-        postEntityRepository
-            .findById(postId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found."));
+        postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
     return Post.from(postEntity);
   }
 
@@ -39,10 +35,7 @@ public class PostService {
 
   public Post updatePost(Long postId, PostPatchRequestBody postPatchRequestBody) {
     var postEntity =
-        postEntityRepository
-            .findById(postId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found."));
+        postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
     postEntity.setBody(postPatchRequestBody.body());
     var updatedEntity = postEntityRepository.save(postEntity);
     return Post.from(updatedEntity);
@@ -50,10 +43,7 @@ public class PostService {
 
   public void deletePost(Long postId) {
     var postEntity =
-        postEntityRepository
-            .findById(postId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found."));
+        postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
     postEntityRepository.delete(postEntity);
   }
 }
