@@ -1,6 +1,8 @@
 package com.fastcampus.board.controller;
 
 import com.fastcampus.board.model.user.User;
+import com.fastcampus.board.model.user.UserAuthenticationResponse;
+import com.fastcampus.board.model.user.UserLoginRequestBody;
 import com.fastcampus.board.model.user.UserSignUpRequestBody;
 import com.fastcampus.board.service.UserService;
 import jakarta.validation.Valid;
@@ -23,10 +25,10 @@ public class UserController {
     return new ResponseEntity<>(user, HttpStatus.OK);
   }
 
-  //  @PostMapping("/authenticate")
-  //  public ResponseEntity<UserAuthenticationResponse> getAccessToken(
-  //      @RequestBody UserLoginRequestBody requestBody) {
-  //    var response = userService.login(requestBody.username(), requestBody.password());
-  //    return new ResponseEntity<>(response, HttpStatus.OK);
-  //  }
+  @PostMapping("/authenticate")
+  public ResponseEntity<UserAuthenticationResponse> authenticate(
+      @Valid @RequestBody UserLoginRequestBody requestBody) {
+    var response = userService.login(requestBody.username(), requestBody.password());
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
 }
