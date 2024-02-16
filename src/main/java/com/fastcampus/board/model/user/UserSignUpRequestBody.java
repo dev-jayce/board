@@ -1,3 +1,5 @@
 package com.fastcampus.board.model.user;
 
-public record UserSignUpRequestBody(String username, String password) {}
+import jakarta.validation.constraints.NotEmpty;
+
+public record UserSignUpRequestBody(@NotEmpty String username, @NotEmpty String password) {}
