@@ -1,7 +1,5 @@
 package com.fastcampus.board.config;
 
-import com.fastcampus.board.service.JWTService;
-import com.fastcampus.board.service.UserService;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -20,8 +19,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class WebConfiguration {
 
-  @Autowired private JWTService jwtService;
-  @Autowired private UserService userService;
+  @Autowired private JwtExceptionFilter jwtExceptionFilter;
+  @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
 
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
@@ -44,10 +43,9 @@ public class WebConfiguration {
         .sessionManagement(
             (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(CsrfConfigurer::disable)
-        .addFilterBefore(
-            new JWTAuthenticationFilter(jwtService, userService),
-            UsernamePasswordAuthenticationFilter.class)
-        .httpBasic(Customizer.withDefaults());
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(jwtExceptionFilter, jwtAuthenticationFilter.getClass())
+        .httpBasic(HttpBasicConfigurer::disable);
 
     return http.build();
   }

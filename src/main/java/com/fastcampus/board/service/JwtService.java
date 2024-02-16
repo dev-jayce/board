@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JWTService {
-  private static final Logger logger = LoggerFactory.getLogger(JWTService.class);
+public class JwtService {
+  private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
   private static final SecretKey key = Jwts.SIG.HS256.key().build();
 
