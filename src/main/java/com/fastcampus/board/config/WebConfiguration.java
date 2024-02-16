@@ -39,7 +39,13 @@ public class WebConfiguration {
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.cors(Customizer.withDefaults())
-        .authorizeHttpRequests((requests) -> requests.anyRequest().authenticated())
+        .authorizeHttpRequests(
+            (requests) ->
+                requests
+                    .requestMatchers("/api/v1/users/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .sessionManagement(
             (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(CsrfConfigurer::disable)

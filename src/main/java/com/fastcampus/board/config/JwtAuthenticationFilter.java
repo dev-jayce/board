@@ -1,6 +1,5 @@
 package com.fastcampus.board.config;
 
-import com.fastcampus.board.exception.jwt.JwtTokenNotFoundException;
 import com.fastcampus.board.service.JwtService;
 import com.fastcampus.board.service.UserService;
 import jakarta.servlet.FilterChain;
@@ -32,11 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
     var securityContext = SecurityContextHolder.getContext();
 
-    if (ObjectUtils.isEmpty(authorization) || !authorization.startsWith(BEARER_PREFIX)) {
-      throw new JwtTokenNotFoundException();
-    }
-
-    if (securityContext.getAuthentication() == null) {
+    if (!ObjectUtils.isEmpty(authorization)
+        && authorization.startsWith(BEARER_PREFIX)
+        && securityContext.getAuthentication() == null) {
       var jwtToken = authorization.substring(BEARER_PREFIX.length());
       var username = jwtService.getUsername(jwtToken);
       var userDetails = userService.loadUserByUsername(username);
