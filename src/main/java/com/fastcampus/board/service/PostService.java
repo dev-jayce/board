@@ -2,12 +2,14 @@ package com.fastcampus.board.service;
 
 import com.fastcampus.board.exception.post.PostNotFoundException;
 import com.fastcampus.board.exception.user.UserNotAllowedException;
+import com.fastcampus.board.exception.user.UserNotFoundException;
 import com.fastcampus.board.model.entity.PostEntity;
 import com.fastcampus.board.model.entity.UserEntity;
 import com.fastcampus.board.model.post.Post;
 import com.fastcampus.board.model.post.PostPatchRequestBody;
 import com.fastcampus.board.model.post.PostPostRequestBody;
 import com.fastcampus.board.repository.PostEntityRepository;
+import com.fastcampus.board.repository.UserEntityRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,17 @@ import org.springframework.stereotype.Service;
 public class PostService {
 
   @Autowired private PostEntityRepository postEntityRepository;
+  @Autowired private UserEntityRepository userEntityRepository;
 
   public List<Post> getPosts() {
     var postEntities = postEntityRepository.findAll();
+    return postEntities.stream().map(Post::from).toList();
+  }
+
+  public List<Post> getPostsByUsername(String username) {
+    var user =
+        userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    List<PostEntity> postEntities = postEntityRepository.findByUser(user);
     return postEntities.stream().map(Post::from).toList();
   }
 
