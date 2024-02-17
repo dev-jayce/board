@@ -24,6 +24,8 @@ public class PostEntity {
 
   @Column private Long repliesCount = 0L;
 
+  @Column private Long likesCount = 0L;
+
   @Column private ZonedDateTime createdDateTime;
 
   @Column private ZonedDateTime updatedDateTime;
@@ -67,6 +69,14 @@ public class PostEntity {
     this.repliesCount = repliesCount;
   }
 
+  public Long getLikesCount() {
+    return likesCount;
+  }
+
+  public void setLikesCount(Long likesCount) {
+    this.likesCount = likesCount;
+  }
+
   public ZonedDateTime getCreatedDateTime() {
     return createdDateTime;
   }
@@ -106,6 +116,7 @@ public class PostEntity {
     return Objects.equals(getPostId(), that.getPostId())
         && Objects.equals(getBody(), that.getBody())
         && Objects.equals(getRepliesCount(), that.getRepliesCount())
+        && Objects.equals(getLikesCount(), that.getLikesCount())
         && Objects.equals(getCreatedDateTime(), that.getCreatedDateTime())
         && Objects.equals(getUpdatedDateTime(), that.getUpdatedDateTime())
         && Objects.equals(getDeletedDateTime(), that.getDeletedDateTime())
@@ -118,6 +129,7 @@ public class PostEntity {
         getPostId(),
         getBody(),
         getRepliesCount(),
+        getLikesCount(),
         getCreatedDateTime(),
         getUpdatedDateTime(),
         getDeletedDateTime(),

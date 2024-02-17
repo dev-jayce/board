@@ -9,6 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -61,5 +62,11 @@ public class PostController {
     logger.info("DELETE /api/v1/posts/{}", postId);
     postService.deletePost(postId, (UserEntity) authentication.getPrincipal());
     return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{postId}/likes")
+  public ResponseEntity<Post> toggleLike(@PathVariable Long postId, Authentication authentication) {
+    var post = postService.toggleLike(postId, (UserEntity) authentication.getPrincipal());
+    return new ResponseEntity<>(post, HttpStatus.OK);
   }
 }
