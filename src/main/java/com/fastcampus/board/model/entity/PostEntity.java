@@ -7,7 +7,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "post")
+@Table(
+    name = "post",
+    indexes = {@Index(name = "post_userid_idx", columnList = "userid")})
 @SQLDelete(sql = "UPDATE \"post\" SET deleteddatetime = CURRENT_TIMESTAMP WHERE postid = ?")
 // Deprecated in Hibernate 6.3
 // @Where(clause = "deletedDateTime IS NULL")
@@ -26,7 +28,18 @@ public class PostEntity {
 
   @Column private ZonedDateTime deletedDateTime;
 
+  @ManyToOne
+  @JoinColumn(name = "userid")
+  private UserEntity user;
+
   public PostEntity() {}
+
+  public static PostEntity of(String body, UserEntity user) {
+    PostEntity post = new PostEntity();
+    post.setBody(body);
+    post.setUser(user);
+    return post;
+  }
 
   public Long getPostId() {
     return postId;
@@ -68,6 +81,14 @@ public class PostEntity {
     this.deletedDateTime = deletedDateTime;
   }
 
+  public UserEntity getUser() {
+    return user;
+  }
+
+  public void setUser(UserEntity user) {
+    this.user = user;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -76,13 +97,19 @@ public class PostEntity {
         && Objects.equals(getBody(), that.getBody())
         && Objects.equals(getCreatedDateTime(), that.getCreatedDateTime())
         && Objects.equals(getUpdatedDateTime(), that.getUpdatedDateTime())
-        && Objects.equals(getDeletedDateTime(), that.getDeletedDateTime());
+        && Objects.equals(getDeletedDateTime(), that.getDeletedDateTime())
+        && Objects.equals(getUser(), that.getUser());
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        getPostId(), getBody(), getCreatedDateTime(), getUpdatedDateTime(), getDeletedDateTime());
+        getPostId(),
+        getBody(),
+        getCreatedDateTime(),
+        getUpdatedDateTime(),
+        getDeletedDateTime(),
+        getUser());
   }
 
   @PrePersist
