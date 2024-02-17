@@ -13,8 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(
     name = "\"user\"",
-    indexes = {@Index(name = "user_username_idx", columnList = "username", unique = true)}
-)
+    indexes = {@Index(name = "user_username_idx", columnList = "username", unique = true)})
 @SQLDelete(sql = "UPDATE \"user\" SET deletedDateTime = CURRENT_TIMESTAMP WHERE userId = ?")
 @SQLRestriction("deletedDateTime IS NULL")
 public class UserEntity implements UserDetails {
@@ -30,6 +29,10 @@ public class UserEntity implements UserDetails {
   @Column private String profile;
 
   @Column private String description;
+
+  @Column private Long followersCount = 0L;
+
+  @Column private Long followingsCount = 0L;
 
   @Column private ZonedDateTime createdDateTime;
 
@@ -95,6 +98,22 @@ public class UserEntity implements UserDetails {
     this.deletedDateTime = deletedDateTime;
   }
 
+  public Long getFollowersCount() {
+    return followersCount;
+  }
+
+  public void setFollowersCount(Long followersCount) {
+    this.followersCount = followersCount;
+  }
+
+  public Long getFollowingsCount() {
+    return followingsCount;
+  }
+
+  public void setFollowingsCount(Long followingsCount) {
+    this.followingsCount = followingsCount;
+  }
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return null;
@@ -133,15 +152,17 @@ public class UserEntity implements UserDetails {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof UserEntity that)) return false;
-    return Objects.equals(getUserId(), that.getUserId())
-        && Objects.equals(getUsername(), that.getUsername())
-        && Objects.equals(getPassword(), that.getPassword())
-        && Objects.equals(getProfile(), that.getProfile())
-        && Objects.equals(getDescription(), that.getDescription())
-        && Objects.equals(getCreatedDateTime(), that.getCreatedDateTime())
-        && Objects.equals(getUpdatedDateTime(), that.getUpdatedDateTime())
-        && Objects.equals(getDeletedDateTime(), that.getDeletedDateTime());
+    if (!(o instanceof UserEntity user)) return false;
+    return Objects.equals(getUserId(), user.getUserId())
+        && Objects.equals(getUsername(), user.getUsername())
+        && Objects.equals(getPassword(), user.getPassword())
+        && Objects.equals(getProfile(), user.getProfile())
+        && Objects.equals(getDescription(), user.getDescription())
+        && Objects.equals(getFollowersCount(), user.getFollowersCount())
+        && Objects.equals(getFollowingsCount(), user.getFollowingsCount())
+        && Objects.equals(getCreatedDateTime(), user.getCreatedDateTime())
+        && Objects.equals(getUpdatedDateTime(), user.getUpdatedDateTime())
+        && Objects.equals(getDeletedDateTime(), user.getDeletedDateTime());
   }
 
   @Override
@@ -152,6 +173,8 @@ public class UserEntity implements UserDetails {
         getPassword(),
         getProfile(),
         getDescription(),
+        getFollowersCount(),
+        getFollowingsCount(),
         getCreatedDateTime(),
         getUpdatedDateTime(),
         getDeletedDateTime());

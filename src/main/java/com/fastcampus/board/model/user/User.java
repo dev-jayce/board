@@ -1,7 +1,6 @@
 package com.fastcampus.board.model.user;
 
 import com.fastcampus.board.model.entity.UserEntity;
-
 import java.time.ZonedDateTime;
 
 public record User(
@@ -9,6 +8,8 @@ public record User(
     String username,
     String profile,
     String description,
+    Long followersCount,
+    Long followingsCount,
     ZonedDateTime createdDateTime,
     ZonedDateTime updatedDateTime) {
 
@@ -18,6 +19,8 @@ public record User(
         user.getUsername(),
         user.getProfile(),
         user.getDescription(),
+        user.getFollowersCount(),
+        user.getFollowingsCount(),
         user.getCreatedDateTime(),
         user.getUpdatedDateTime());
   }
