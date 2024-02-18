@@ -26,19 +26,17 @@ public class PostService {
   @Autowired private LikeEntityRepository likeEntityRepository;
 
   public List<Post> getPosts(UserEntity currentUser) {
-    var postEntities = postEntityRepository.findAll();
-    return postEntities.stream()
-        .map(postEntity -> getPostWithLikingStatus(postEntity, currentUser))
-        .toList();
+    var projections = postEntityRepository.findPostsWithLikingStatus(currentUser.getUserId());
+    return projections.stream().map(Post::from).toList();
   }
 
   public List<Post> getPostsByUsername(String username, UserEntity currentUser) {
     var user =
         userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
-    List<PostEntity> postEntities = postEntityRepository.findByUser(user);
-    return postEntities.stream()
-        .map(postEntity -> getPostWithLikingStatus(postEntity, currentUser))
-        .toList();
+    var projections =
+        postEntityRepository.findPostsByUserIdWithLikingStatus(
+            user.getUserId(), currentUser.getUserId());
+    return projections.stream().map(Post::from).toList();
   }
 
   public Post getPostByPostId(Long postId, UserEntity currentUser) {

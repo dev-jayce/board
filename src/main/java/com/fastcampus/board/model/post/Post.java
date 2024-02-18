@@ -3,6 +3,7 @@ package com.fastcampus.board.model.post;
 import com.fastcampus.board.model.entity.PostEntity;
 import com.fastcampus.board.model.user.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -40,5 +41,26 @@ public record Post(
         postEntity.getUpdatedDateTime(),
         postEntity.getDeletedDateTime(),
         isLiking);
+  }
+
+  public static Post from(PostWithLikingStatusProjection projection) {
+    return new Post(
+        projection.getPostId(),
+        projection.getBody(),
+        projection.getRepliesCount(),
+        projection.getLikesCount(),
+        new User(
+            projection.getUserId(),
+            projection.getUsername(),
+            projection.getUserProfile(),
+            projection.getUserDescription(),
+            projection.getUserFollowersCount(),
+            projection.getUserFollowingsCount(),
+            projection.getUserCreatedDateTime().atZone(ZoneId.systemDefault()),
+            projection.getUpdatedDateTime().atZone(ZoneId.systemDefault())),
+        projection.getCreatedDateTime().atZone(ZoneId.systemDefault()),
+        projection.getUpdatedDateTime().atZone(ZoneId.systemDefault()),
+        null,
+        projection.getIsLiking());
   }
 }
