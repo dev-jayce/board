@@ -2,8 +2,10 @@ package com.fastcampus.board.controller;
 
 import com.fastcampus.board.model.entity.UserEntity;
 import com.fastcampus.board.model.post.Post;
+import com.fastcampus.board.model.reply.Reply;
 import com.fastcampus.board.model.user.*;
 import com.fastcampus.board.service.PostService;
+import com.fastcampus.board.service.ReplyService;
 import com.fastcampus.board.service.UserService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   @Autowired UserService userService;
   @Autowired PostService postService;
+
+  @Autowired ReplyService replyService;
 
   @GetMapping
   public ResponseEntity<List<User>> getUsers(
@@ -39,6 +43,20 @@ public class UserController {
     var posts =
         postService.getPostsByUsername(username, (UserEntity) authentication.getPrincipal());
     return new ResponseEntity<>(posts, HttpStatus.OK);
+  }
+
+  @GetMapping("/{username}/replies")
+  public ResponseEntity<List<Reply>> getRepliesByUser(@PathVariable String username) {
+    var replies = replyService.getRepliesByUser(username);
+    return new ResponseEntity<>(replies, HttpStatus.OK);
+  }
+
+  @GetMapping("/{username}/liked-users")
+  public ResponseEntity<List<LikedUser>> getLikedUsersByUser(
+      @PathVariable String username, Authentication authentication) {
+    var likedUsers =
+        userService.getLikedUsersByUser(username, (UserEntity) authentication.getPrincipal());
+    return new ResponseEntity<>(likedUsers, HttpStatus.OK);
   }
 
   @PatchMapping("/{username}")

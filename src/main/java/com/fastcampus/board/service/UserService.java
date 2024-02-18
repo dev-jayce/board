@@ -3,16 +3,15 @@ package com.fastcampus.board.service;
 import com.fastcampus.board.exception.follow.FollowAlreadyExistsException;
 import com.fastcampus.board.exception.follow.FollowNotFoundException;
 import com.fastcampus.board.exception.follow.InvalidFollowException;
+import com.fastcampus.board.exception.post.PostNotFoundException;
 import com.fastcampus.board.exception.user.UserAlreadyExistsException;
 import com.fastcampus.board.exception.user.UserNotAllowedException;
 import com.fastcampus.board.exception.user.UserNotFoundException;
 import com.fastcampus.board.model.entity.FollowEntity;
 import com.fastcampus.board.model.entity.UserEntity;
-import com.fastcampus.board.model.user.Follower;
-import com.fastcampus.board.model.user.User;
-import com.fastcampus.board.model.user.UserAuthenticationResponse;
-import com.fastcampus.board.model.user.UserPatchRequestBody;
+import com.fastcampus.board.model.user.*;
 import com.fastcampus.board.repository.FollowEntityRepository;
+import com.fastcampus.board.repository.PostEntityRepository;
 import com.fastcampus.board.repository.UserEntityRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements UserDetailsService {
 
   @Autowired private UserEntityRepository userEntityRepository;
+
+  @Autowired private PostEntityRepository postEntityRepository;
 
   @Autowired private FollowEntityRepository followEntityRepository;
 
@@ -78,6 +79,27 @@ public class UserService implements UserDetailsService {
     var user =
         userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     return getUserWithFollowingStatus(user, currentUser);
+  }
+
+  public List<LikedUser> getLikedUsersByPostId(Long postId, UserEntity currentUser) {
+    var post = postEntityRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+    var projections =
+        userEntityRepository.findUsersWhoLikedPostByPostIdWithFollowingStatus(
+            post.getPostId(), currentUser.getUserId());
+
+    return projections.stream().map(LikedUser::from).toList();
+  }
+
+  public List<LikedUser> getLikedUsersByUser(String username, UserEntity currentUser) {
+    var user =
+        userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+    var projections =
+        userEntityRepository.findUsersWhoLikedPostByUserIdWithFollowingStatus(
+            user.getUserId(), currentUser.getUserId());
+
+    return projections.stream().map(LikedUser::from).toList();
   }
 
   public User updateUser(

@@ -3,6 +3,7 @@ package com.fastcampus.board.service;
 import com.fastcampus.board.exception.post.PostNotFoundException;
 import com.fastcampus.board.exception.reply.ReplyNotFoundException;
 import com.fastcampus.board.exception.user.UserNotAllowedException;
+import com.fastcampus.board.exception.user.UserNotFoundException;
 import com.fastcampus.board.model.entity.PostEntity;
 import com.fastcampus.board.model.entity.ReplyEntity;
 import com.fastcampus.board.model.entity.UserEntity;
@@ -29,6 +30,15 @@ public class ReplyService {
     var postEntity =
         postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
     var replyEntities = replyEntityRepository.findByPost(postEntity);
+    return replyEntities.stream().map(Reply::from).toList();
+  }
+
+  public List<Reply> getRepliesByUser(String username) {
+    var user =
+        userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+    var replyEntities = replyEntityRepository.findByUser(user);
+
     return replyEntities.stream().map(Reply::from).toList();
   }
 
