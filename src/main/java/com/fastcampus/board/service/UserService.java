@@ -8,6 +8,7 @@ import com.fastcampus.board.exception.user.UserNotAllowedException;
 import com.fastcampus.board.exception.user.UserNotFoundException;
 import com.fastcampus.board.model.entity.FollowEntity;
 import com.fastcampus.board.model.entity.UserEntity;
+import com.fastcampus.board.model.user.Follower;
 import com.fastcampus.board.model.user.User;
 import com.fastcampus.board.model.user.UserAuthenticationResponse;
 import com.fastcampus.board.model.user.UserPatchRequestBody;
@@ -66,20 +67,17 @@ public class UserService implements UserDetailsService {
     }
   }
 
-  public List<User> getUsers(String query) {
-    List<UserEntity> users;
-    if (query != null && !query.isBlank()) {
-      users = userEntityRepository.findByUsernameContaining(query);
-    } else {
-      users = userEntityRepository.findAll();
-    }
-    return users.stream().map(User::from).toList();
+  public List<User> getUsers(String query, UserEntity currentUser) {
+    var projections =
+        userEntityRepository.findUsersByOptionalUsernameWithFollowingStatus(
+            query, currentUser.getUserId());
+    return projections.stream().map(User::from).toList();
   }
 
-  public User getUser(String username) {
+  public User getUser(String username, UserEntity currentUser) {
     var user =
         userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
-    return User.from(user);
+    return getUserWithFollowingStatus(user, currentUser);
   }
 
   public User updateUser(
@@ -119,7 +117,7 @@ public class UserService implements UserDetailsService {
     userEntityRepository.save(following);
     userEntityRepository.save(currentUser);
 
-    return User.from(following);
+    return User.from(following, true);
   }
 
   @Transactional
@@ -144,20 +142,30 @@ public class UserService implements UserDetailsService {
     userEntityRepository.save(following);
     userEntityRepository.save(currentUser);
 
-    return User.from(following);
+    return User.from(following, false);
   }
 
-  public List<User> getFollowersByUsername(String username) {
+  public List<Follower> getFollowersByUsername(String username, UserEntity currentUser) {
     var following =
         userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
-    var followEntities = followEntityRepository.findByFollowing(following);
-    return followEntities.stream().map(follow -> User.from(follow.getFollower())).toList();
+    var projections =
+        userEntityRepository.findFollowersByFollowingUserIdWithFollowingStatus(
+            following.getUserId(), currentUser.getUserId());
+    return projections.stream().map(Follower::from).toList();
   }
 
-  public List<User> getFollowingsByUsername(String username) {
+  public List<User> getFollowingsByUsername(String username, UserEntity currentUser) {
     var follower =
         userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
-    var followEntities = followEntityRepository.findByFollower(follower);
-    return followEntities.stream().map(follow -> User.from(follow.getFollowing())).toList();
+    var projections =
+        userEntityRepository.findFollowingsByFollowerUserIdWithFollowingStatus(
+            follower.getUserId(), currentUser.getUserId());
+    return projections.stream().map(User::from).toList();
+  }
+
+  private User getUserWithFollowingStatus(UserEntity user, UserEntity currentUser) {
+    var isFollowing =
+        followEntityRepository.findByFollowerAndFollowing(currentUser, user).isPresent();
+    return User.from(user, isFollowing);
   }
 }
