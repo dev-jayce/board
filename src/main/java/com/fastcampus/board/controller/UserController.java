@@ -32,8 +32,10 @@ public class UserController {
   }
 
   @GetMapping("/{username}/posts")
-  public ResponseEntity<List<Post>> getPostsByUser(@PathVariable String username) {
-    var posts = postService.getPostsByUsername(username);
+  public ResponseEntity<List<Post>> getPostsByUser(
+      @PathVariable String username, Authentication authentication) {
+    var posts =
+        postService.getPostsByUsername(username, (UserEntity) authentication.getPrincipal());
     return new ResponseEntity<>(posts, HttpStatus.OK);
   }
 
